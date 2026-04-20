@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { 
   Plus, Minus, Trash2, X, Search, LayoutDashboard, 
@@ -101,10 +100,8 @@ const AdminDashboard = ({ leads, products }) => {
   
   // PROTEÇÃO CONTRA CRASH: (lead.items || []) blinda o sistema contra leads antigos sem items
   const totalItemsSold = validLeads.reduce((acc, lead) => acc + (lead.items || []).reduce((sum, item) => sum + (item.quantity || 0), 0), 0);
-  
   const lowStockProducts = (products || []).filter(p => p.stock > 0 && p.stock <= 3);
   const outOfStockProducts = (products || []).filter(p => p.stock === 0);
-
   const statusColors = { 'NOVO': 'text-blue-500 bg-blue-500/10', 'EM ATENDIMENTO': 'text-amber-500 bg-amber-500/10', 'CONCLUÍDO': 'text-emerald-500 bg-emerald-500/10', 'CANCELADO': 'text-red-500 bg-red-500/10' };
 
   return (
@@ -173,7 +170,7 @@ const AdminDashboard = ({ leads, products }) => {
                   <span className="text-[9px] font-black text-amber-500 shrink-0">Resta(m) {p.stock}</span>
                 </div>
               ))}
-           </div>
+          </div>
         </div>
       )}
     </div>
@@ -181,12 +178,11 @@ const AdminDashboard = ({ leads, products }) => {
 };
 
 const AdminInventory = ({ products, setProducts, showToast }) => {
-  const [editMode, setEditMode] = useState(null); 
+  const [editMode, setEditMode] = useState(null);
   const [invSearch, setInvSearch] = useState('');
   const [previewImage, setPreviewImage] = useState('');
   const [formSizes, setFormSizes] = useState([]);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
-
   const [showScanner, setShowScanner] = useState(false);
   const [scannedProduct, setScannedProduct] = useState(null);
   const [scannedSize, setScannedSize] = useState('');
@@ -247,7 +243,7 @@ const AdminInventory = ({ products, setProducts, showToast }) => {
         
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
-                mutation.addedNodes.forEach((node) => {
+               mutation.addedNodes.forEach((node) => {
                     if (node.tagName === 'VIDEO') {
                         node.setAttribute('playsinline', 'true');
                         node.setAttribute('webkit-playsinline', 'true');
@@ -339,7 +335,8 @@ const AdminInventory = ({ products, setProducts, showToast }) => {
           } else {
             if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
           }
-          canvas.width = width; canvas.height = height;
+          canvas.width = width;
+          canvas.height = height;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
           setPreviewImage(canvas.toDataURL('image/jpeg', 0.6)); 
@@ -382,14 +379,12 @@ const AdminInventory = ({ products, setProducts, showToast }) => {
 
     let foundProduct = null;
     let foundSize = '';
-
     foundProduct = products.find(p => (p.sku || '').toUpperCase() === sanitizedCode);
     
     if (!foundProduct && sanitizedCode.includes('-')) {
         const parts = sanitizedCode.split('-');
         const baseSku = parts.slice(0, -1).join('-'); 
-        const possibleSize = parts[parts.length - 1]; 
-
+        const possibleSize = parts[parts.length - 1];
         const possibleProduct = products.find(p => (p.sku || '').toUpperCase() === baseSku);
         if (possibleProduct) {
             const sizeExists = (possibleProduct.sizes || []).some(s => (s.size || s).toString().toUpperCase() === possibleSize);
@@ -407,7 +402,7 @@ const AdminInventory = ({ products, setProducts, showToast }) => {
         } else if ((foundProduct.sizes || []).length === 1) {
              setScannedSize(foundProduct.sizes[0].size || foundProduct.sizes[0]);
         } else {
-             setScannedSize(''); 
+             setScannedSize('');
         }
         showToast('Produto localizado.', 'success');
     } else {
@@ -451,7 +446,6 @@ const AdminInventory = ({ products, setProducts, showToast }) => {
       const refreshedProduct = updatedProducts.find(p => p.id === scannedProduct.id);
       setScannedProduct(refreshedProduct);
       showToast(actionType === 'add' ? '+1 Estoque' : '-1 Estoque', actionType === 'add' ? 'success' : 'error');
-      
       if (!cameraActive && scannerInputRef.current) scannerInputRef.current.focus();
   };
 
@@ -670,7 +664,6 @@ const AdminLeads = ({ leads, setLeads, products, setProducts, showToast, config 
     const oldStatus = leadToUpdate.status || 'NOVO';
     let inventoryChanged = false;
     let updatedProducts = [...products];
-    
     if (oldStatus !== 'CONCLUÍDO' && newStatus === 'CONCLUÍDO') {
       (leadToUpdate.items || []).forEach(cartItem => {
         updatedProducts = updatedProducts.map(p => {
@@ -705,7 +698,6 @@ const AdminLeads = ({ leads, setLeads, products, setProducts, showToast, config 
     setExpandedLead(null);
   };
   const statusColors = { 'NOVO': 'text-blue-500', 'EM ATENDIMENTO': 'text-amber-500', 'CONCLUÍDO': 'text-emerald-500', 'CANCELADO': 'text-red-500' };
-
   return (
     <div className="p-6 animate-in space-y-4 pb-32">
       <h3 className="font-black italic uppercase text-white tracking-widest text-lg mb-6">CRM / Clientes</h3>
@@ -821,7 +813,6 @@ const AdminConfig = ({ config, setConfig, showToast }) => {
   const [logoZoomPreview, setLogoZoomPreview] = useState(config.logoZoom || 1.5);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [phrases, setPhrases] = useState(config.marqueePhrases || []);
-
   const handleLogoFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -844,13 +835,11 @@ const AdminConfig = ({ config, setConfig, showToast }) => {
       reader.readAsDataURL(file);
     }
   };
-
   const handlePhraseChange = (index, value) => {
     const n = [...phrases];
     n[index] = value.toUpperCase();
     setPhrases(n);
   };
-
   const handleSaveConfig = (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
@@ -881,7 +870,7 @@ const AdminConfig = ({ config, setConfig, showToast }) => {
                 <img src={logoPreview} style={{ transform: `scale(${logoZoomPreview})` }} className="w-full h-full object-contain mix-blend-screen transition-transform" alt="Logo" />
               </div>
             ) : (
-              <div className="flex flex-col items-center text-zinc-600">
+               <div className="flex flex-col items-center text-zinc-600">
                 <Upload size={20} className="mb-2" />
                 <span className="text-[9px] font-black uppercase">Subir Logo (PNG/Fundo Preto)</span>
               </div>
@@ -893,7 +882,7 @@ const AdminConfig = ({ config, setConfig, showToast }) => {
               <div className="flex justify-between items-center">
                 <label className="text-[9px] font-black text-zinc-500 uppercase px-2">Zoom da Logo</label>
                 <span className="text-[10px] font-bold text-emerald-500">{logoZoomPreview}x</span>
-              </div>
+               </div>
               <input type="range" name="logoZoom" min="0.5" max="5" step="0.1" value={logoZoomPreview} onChange={(e) => setLogoZoomPreview(parseFloat(e.target.value))} className="w-full accent-emerald-500" />
               <button type="button" onClick={() => setLogoPreview('')} className="text-[9px] font-black uppercase text-red-500 flex items-center gap-1 ml-auto"><Trash2 size={12}/> Remover</button>
             </div>
@@ -993,6 +982,7 @@ export default function App() {
   useEffect(() => { localStorage.setItem(LEAD_STORAGE_KEY, JSON.stringify(leads)); }, [leads]);
 
   const activeBanners = useMemo(() => (banners || []).filter(b => b.active), [banners]);
+
   useEffect(() => {
     if (isAdmin || activeBanners.length <= 1) return;
     const timer = setInterval(() => { setCurrentBannerSlide((prev) => (prev + 1) % activeBanners.length); }, 5000); 
@@ -1033,6 +1023,7 @@ export default function App() {
   };
 
   const categories = useMemo(() => ['TODOS', ...new Set((products || []).map(p => p.category))], [products]);
+
   const subtotal = useMemo(() => (cart || []).reduce((acc, item) => acc + (item.price * item.quantity), 0), [cart]);
 
   const handleProductClick = (product) => {
@@ -1074,7 +1065,8 @@ export default function App() {
   };
 
   const handleFinalize = () => {
-    if (!currentLead.name || currentLead.phone.length < 10) { showToast('Preencha os dados corretamente.', 'error'); return; }
+    if (!currentLead.name || currentLead.phone.length < 10) { showToast('Preencha os dados corretamente.', 'error');
+      return; }
     setIsRedirecting(true);
     const orderNum = Math.floor(10000 + Math.random() * 90000).toString();
     const updatedProducts = products.map(p => {
@@ -1208,7 +1200,7 @@ export default function App() {
                      
                      {isOutOfStock && (
                         <div className="absolute inset-0 bg-zinc-950/60 backdrop-blur-[2px] flex items-center justify-center">
-                            <span className="bg-zinc-950 text-white text-[9px] font-black uppercase tracking-widest px-4 py-2 rounded-full border border-white/20 shadow-2xl">Esgotado</span>
+                           <span className="bg-zinc-950 text-white text-[9px] font-black uppercase tracking-widest px-4 py-2 rounded-full border border-white/20 shadow-2xl">Esgotado</span>
                         </div>
                      )}
 
@@ -1217,7 +1209,7 @@ export default function App() {
                      )}
                    </div>
                    <div className="p-4 bg-zinc-950/50 flex-1 flex flex-col justify-between">
-                     <h3 className="font-black text-zinc-400 text-[10px] uppercase line-clamp-2 leading-tight">{product.name}</h3>
+                      <h3 className="font-black text-zinc-400 text-[10px] uppercase line-clamp-2 leading-tight">{product.name}</h3>
                      <p className={`font-black text-sm mt-2 ${isOutOfStock ? 'text-zinc-600 line-through' : 'text-white'}`}>R$ {(product.price || 0).toFixed(2)}</p>
                    </div>
                  </div>
@@ -1320,6 +1312,7 @@ export default function App() {
                   const sz = typeof s === 'string' ? s : s.size;
                   const stock = typeof s === 'string' ? selectedProduct.stock : s.stock;
                   const qty = selectedSizes[sz] || 0;
+                  
                   if (qty > 0) {
                     return (
                       <div key={idx} className="py-2.5 rounded-xl border border-emerald-500 bg-emerald-500/10 flex flex-col items-center justify-center gap-1.5 shadow-inner">
@@ -1406,7 +1399,7 @@ export default function App() {
 
       {showLeadModal && (
         <div className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-xl flex items-center justify-center p-6">
-          <div className="bg-zinc-950 w-full max-w-sm rounded-[32px] p-8 space-y-6 shadow-2xl border border-white/10 animate-in relative overflow-hidden">
+           <div className="bg-zinc-950 w-full max-w-sm rounded-[32px] p-8 space-y-6 shadow-2xl border border-white/10 animate-in relative overflow-hidden">
             <button onClick={() => { setShowLeadModal(false); setCheckoutSuccess(false); }} className="absolute top-5 right-5 text-zinc-500 bg-zinc-900 p-2 rounded-full touch-manipulation"><X size={16}/></button>
             {checkoutSuccess ? (
               <div className="text-center relative z-10 space-y-2 mt-4 animate-in">
@@ -1437,11 +1430,10 @@ export default function App() {
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        
         ::-webkit-scrollbar { display: none; }
         
         body { 
-          font-family: 'Inter', sans-serif; 
+          font-family: 'Inter', sans-serif;
           -webkit-tap-highlight-color: transparent; 
           background-color: #09090b; 
           overflow-x: hidden;
@@ -1469,6 +1461,3 @@ export default function App() {
     </div>
   );
 }
-
-
-
